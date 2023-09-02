@@ -12,7 +12,10 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
     with app.app_context():
-        setup_db(app)
+        if test_config is None:
+            setup_db(app)
+        else:
+            setup_db(app, test_config)
 
     """
     @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
@@ -27,7 +30,15 @@ def create_app(test_config=None):
     Create an endpoint to handle GET requests
     for all available categories.
     """
-
+    @app.route('/categories', methods=['GET'])
+    def get_categories():
+        categories = Category.query.all()
+        categories_json_formated = [ category.format() for category in categories ]
+        return jsonify({
+            "categories": categories_json_formated, 
+            "success": True
+        })
+    
 
     """
     @TODO:
