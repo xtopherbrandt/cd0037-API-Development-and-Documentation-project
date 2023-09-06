@@ -30,6 +30,18 @@ class TriviaTestCase(unittest.TestCase):
         
         self.assertEqual( result.status_code, 200 )
         self.assertTrue('categories' in json.loads( result.data).keys())
+        self.assertGreater( len(json.loads( result.data)['categories']), 0 )
+
+    def test_get_categories_returns_method_not_allowed_for_POST(self):
+        result = self.client().post('/categories')
+        self.assertEqual( result.status_code, 405 )
+        self.assertEqual({
+            'success': False,
+            'error': 405,
+            'message': 'Method not allowed.'
+        }, json.loads(result.data))
+        
+    
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

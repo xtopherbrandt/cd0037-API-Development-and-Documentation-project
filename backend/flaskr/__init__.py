@@ -25,11 +25,7 @@ def create_app(test_config=None):
     @TODO: Use the after_request decorator to set Access-Control-Allow
     """
 
-    """
-    @TODO:
-    Create an endpoint to handle GET requests
-    for all available categories.
-    """
+    
     @app.route('/categories', methods=['GET'])
     def get_categories():
         categories = Category.query.all()
@@ -109,6 +105,23 @@ def create_app(test_config=None):
     Create error handlers for all expected errors
     including 404 and 422.
     """
+    @app.errorhandler(405)
+    def handle_method_not_allowed(self):
+        return jsonify({
+            'success': False,
+            'error': 405,
+            'message': 'Method not allowed.'
+        }), 405
+        
+        
+    
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            "success": False, 
+            "error": 400, 
+            "message": "bad request"
+        }), 400
 
     return app
 
