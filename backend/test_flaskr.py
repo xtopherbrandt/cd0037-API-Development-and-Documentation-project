@@ -37,8 +37,7 @@ class TriviaTestCase(unittest.TestCase):
         return
             
     """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
+    Categories
     """
     def test_get_categories_returns_all_categories(self):
         result = self.client().get('/categories')
@@ -62,6 +61,10 @@ class TriviaTestCase(unittest.TestCase):
         result = self.client().post('/categories')
         self.assertEqual( result.status_code, 405 )
         self.check_basic_response_format( result )
+        
+    """
+    GET Questions
+    """
         
     def test_get_questions_without_page_returns_first_page_of_questions(self):
         result = self.client().get('/questions')
@@ -106,6 +109,25 @@ class TriviaTestCase(unittest.TestCase):
         
         current_category = data_json['current_category']
         self.assertNotEqual( current_category, None, 'Incorrect response format. Current category is set to None')
+
+    def test_get_a_question_by_id_returns_a_question(self):
+        get_result = self.client().get(f'/questions/1')
+        self.check_basic_response_format(get_result, ['question'])
+
+    def test_get_of_non_existant_question_results_in_404(self):
+        get_result = self.client().get(f'/questions/10000')
+        
+        self.check_basic_response_format(get_result)
+        get_data_json = json.loads(get_result.data)
+ 
+        self.assertEqual(get_result.status_code, 404, 'Get of a non-existant question should return a 404.')
+        self.assertEqual(get_data_json['error'], 404, 'Incorrect response message. Get of a non-existant question should return a 404')
+
+        
+                
+    """
+    DELETE Questions
+    """
         
     def test_delete_question_removes_the_question(self):
         get_result = self.client().get('/questions')
@@ -113,9 +135,8 @@ class TriviaTestCase(unittest.TestCase):
         get_data_json = json.loads( get_result.data )
         first_question = get_data_json['questions'][0]
         delete_result = self.client().delete(f'/questions/{first_question["id"]}')
-        delete_data_json = json.loads(delete_result.data)
-        self.assertIn('success', delete_data_json, 'Incorrect response format. Missing success key.')
-        self.assertTrue(delete_data_json['success'], 'Delete of the first question did not return a success response.')
+        self.check_basic_response_format(delete_result)
+        self.assertEqual(delete_result.status_code, 200, 'Delete of a valid question resulted in an error.')
         
         get_result_2 = self.client().get('/questions')
         
@@ -127,12 +148,33 @@ class TriviaTestCase(unittest.TestCase):
     def test_delete_of_non_existant_question_results_in_404(self):
         delete_result = self.client().delete(f'/questions/10000')
         
+        self.check_basic_response_format(delete_result)
         delete_data_json = json.loads(delete_result.data)
-        self.assertIn('success', delete_data_json, 'Incorrect response format. Missing success key.')
-        self.assertFalse(delete_data_json['success'], 'Delete of a non-existant question returned success = True.')
+ 
         self.assertEqual(delete_result.status_code, 404, 'Delete of a non-existant question should return a 404.')
         self.assertEqual(delete_data_json['error'], 404, 'Incorrect response message. Delete of a non-existant question should return a 404')
+
+    """
+    POST Questions
+    """
+    def test_post_question_adds_a_qustion(self):
+        new_question = {'question': 'Why do we write our tests first?',
+                        'answer': 'So that we only satify those tests.',
+                        'category': '1',
+                        'difficulty': '2'}
         
+        post_result = self.client().post('/questions', json=new_question)
+        
+        self.check_basic_response_format(post_result, ['question'])
+        self.assertEqual(post_result.status_code, 200, 'Posting a valid question resulted in an error')
+        post_result_json = json.loads(post_result.data)
+        self.assertEqual(new_question['question'], post_result_json['question']['question'], 'The question returned after posting a new question should be the same question.')
+        
+        get_result = self.client().get(f'/questions/{post_result_json["question"]["id"]}')
+        get_result_json = json.loads(get_result.data)
+        self.assertDictEqual(post_result_json['question'], get_result_json['question'] )
+        
+             
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()

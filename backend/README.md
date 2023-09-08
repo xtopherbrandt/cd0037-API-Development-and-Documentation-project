@@ -86,6 +86,17 @@ Retrieves a paginated list of all questions.
 json { "categories": { "1": "Science", "2": "Art", "3": "Geography", "4": "History", "5": "Entertainment", "6": "Sports" }, "current_category": null, "questions": [ { "id": 1, "question": "What is the capital of France?", "answer": "Paris", "difficulty": 2, "category": 3 }, ... ], "success": true, "total_questions": 20 }
 ```
 
+### GET /question/{question_id}
+Retrieves a single question by it's Id.
+
+**Request Parameters**:
+* None
+
+**Response Body**: 
+```
+json { "question": { "id": 1, "question": "What is the capital of France?", "answer": "Paris", "difficulty": 2, "category": 3 }, "success": true }
+```
+
 ### GET /categories/{category_id}/questions
 Retrieves a paginated list of questions in a specific category.
 
@@ -107,7 +118,7 @@ json { "question": "What is the capital of Italy?", "answer": "Rome", "difficult
 
 **Response Body**: 
 ```
-json { "success": true }
+json { "question": { "id": 10, "question": "What is the chemical symbol for gold?", "answer": "Au", "difficulty": 3, "category": 1 }, "success": true }
 ```
 
 ### DELETE /questions/{question_id}
