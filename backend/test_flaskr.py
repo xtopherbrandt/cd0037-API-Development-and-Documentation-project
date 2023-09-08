@@ -107,6 +107,32 @@ class TriviaTestCase(unittest.TestCase):
         current_category = data_json['current_category']
         self.assertNotEqual( current_category, None, 'Incorrect response format. Current category is set to None')
         
+    def test_delete_question_removes_the_question(self):
+        get_result = self.client().get('/questions')
+        
+        get_data_json = json.loads( get_result.data )
+        first_question = get_data_json['questions'][0]
+        delete_result = self.client().delete(f'/questions/{first_question["id"]}')
+        delete_data_json = json.loads(delete_result.data)
+        self.assertIn('success', delete_data_json, 'Incorrect response format. Missing success key.')
+        self.assertTrue(delete_data_json['success'], 'Delete of the first question did not return a success response.')
+        
+        get_result_2 = self.client().get('/questions')
+        
+        get_data_json_2 = json.loads( get_result_2.data )
+        questions = get_data_json_2['questions']
+        deleted_question = [question for question in questions if question['id']==first_question['id'] ]
+        self.assertEqual( len(deleted_question), 0, f"The question with id {first_question['id']} was not deleted.")
+        
+    def test_delete_of_non_existant_question_results_in_404(self):
+        delete_result = self.client().delete(f'/questions/10000')
+        
+        delete_data_json = json.loads(delete_result.data)
+        self.assertIn('success', delete_data_json, 'Incorrect response format. Missing success key.')
+        self.assertFalse(delete_data_json['success'], 'Delete of a non-existant question returned success = True.')
+        self.assertEqual(delete_result.status_code, 404, 'Delete of a non-existant question should return a 404.')
+        self.assertEqual(delete_data_json['error'], 404, 'Incorrect response message. Delete of a non-existant question should return a 404')
+        
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()

@@ -53,18 +53,6 @@ def create_app(test_config=None):
         })
     
 
-    """
-    @TODO:
-    Create an endpoint to handle GET requests for questions,
-    including pagination (every 10 questions).
-    This endpoint should return a list of questions,
-    number of total questions, current category, categories.
-
-    TEST: At this point, when you start the application
-    you should see questions and categories generated,
-    ten questions per page and pagination at the bottom of the screen for three pages.
-    Clicking on the page numbers should update the questions.
-    """
     @app.route('/questions', methods=['GET'])
     def get_questions_no_page_specified():
         questions = Question.query.order_by(Question.id).all()
@@ -89,6 +77,23 @@ def create_app(test_config=None):
     This removal will persist in the database and when you refresh the page.
     """
 
+    @app.route('/questions/<int:question_id>', methods=['DELETE'])
+    def delete_question(question_id):
+        question_to_delete = Question.query.filter(Question.id == question_id).one_or_none()
+        
+        if question_to_delete is None:
+            abort(404)
+        else:
+            try:
+                question_to_delete.delete()
+            except:
+                abort(500)
+        
+        return jsonify({
+            'success': True
+        })
+                
+    
     """
     @TODO:
     Create an endpoint to POST a new question,
@@ -137,6 +142,14 @@ def create_app(test_config=None):
     Create error handlers for all expected errors
     including 404 and 422.
     """
+    @app.errorhandler(404)
+    def handle_resource_not_found(self):
+        return jsonify({
+            'success': False,
+            'error': 404,
+            'message': 'Resource not found.'
+        }), 404
+        
     @app.errorhandler(405)
     def handle_method_not_allowed(self):
         return jsonify({
@@ -148,12 +161,20 @@ def create_app(test_config=None):
         
     
     @app.errorhandler(400)
-    def bad_request(error):
+    def handle_bad_request(error):
         return jsonify({
             "success": False, 
             "error": 400, 
             "message": "bad request"
         }), 400
-
+    
+    @app.errorhandler(500)
+    def handle_server_error(error):
+        return jsonify({
+            "success": False, 
+            "error": 500, 
+            "message": "Server error."
+        }), 500
+        
     return app
 
