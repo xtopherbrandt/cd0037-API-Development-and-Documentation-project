@@ -174,6 +174,15 @@ class TriviaTestCase(unittest.TestCase):
         get_result_json = json.loads(get_result.data)
         self.assertDictEqual(post_result_json['question'], get_result_json['question'] )
         
+    def test_posting_an_incomplete_question_results_in_a_400(self):
+        new_question = {'question': 'Why do we write our tests first?',
+                        'answer': 'So that we only satify those tests.'}
+        
+        post_result = self.client().post('/questions', json=new_question)
+        
+        self.check_basic_response_format(post_result)
+        self.assertEqual(post_result.status_code, 400, 'Posting an invalid question should result in an error')
+        
              
 # Make the tests conveniently executable
 if __name__ == "__main__":
