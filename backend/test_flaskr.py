@@ -98,7 +98,17 @@ class TriviaTestCase(unittest.TestCase):
         id_of_last_question = data_json_1['questions'][-1]['id']
         
         self.assertGreater(id_of_first_question, id_of_last_question, 'First question of second page is not greater than last question of first page.')
-
+    
+    def test_get_questions_non_existant_page_returns_an_empty_set(self):
+        get_result = self.client().get('/questions?page=99999')
+        
+        get_result_json = json.loads( get_result.data )
+        
+        self.assertEqual( get_result.status_code, 200 )
+        self.check_basic_response_format( get_result, ['questions'] )
+        
+        self.assertEqual(len(get_result_json['questions']), 0, 'Requesting a non-existant page of questions should return an empty page.')
+        
     def test_get_questions_without_category_sets_current_category_to_a_valid_category(self):
         result = self.client().get('/questions')
         
@@ -141,6 +151,33 @@ class TriviaTestCase(unittest.TestCase):
         get_result_json = json.loads(get_result.data)
         
         self.assertGreater(len(get_result_json['questions']), 1, 'Get questions searching for 'in' with page 2 should return more than 1 question')
+    
+    def test_get_questions_with_category_gets_only_those_questions(self):
+        questions_read = 0
+        page = 1
+        get_all_result = self.client().get(f'/questions?page={page}')
+        get_all_result_json = json.loads(get_all_result.data)
+        science_questions = [question for question in get_all_result_json['questions'] if question['category']==1 ]
+        total_questions = get_all_result_json['total_questions']
+        while questions_read < total_questions:
+            questions_read += len(get_all_result_json['questions'])
+            page += 1
+            get_all_result = self.client().get(f'/questions?page={page}')
+            get_all_result_json = json.loads(get_all_result.data)
+            new_science_questions = [question for question in get_all_result_json['questions'] if question['category']==1 ]
+            science_questions.extend(new_science_questions)
+            
+        
+        get_science_questions_result = self.client().get('/categories/1/questions')
+        get_science_questions_json = json.loads(get_science_questions_result.data)
+        
+        self.check_basic_response_format( get_science_questions_result, ['categories', 'questions', 'current_category', 'total_questions'])
+        self.assertEqual(len(science_questions), len(get_science_questions_json['questions']), 'Get questions by category should have the same number of questions as those from the full set with that category')
+        i = 0
+        for question in science_questions:
+            self.assertDictEqual(question, get_science_questions_json['questions'][i])
+            i += 1
+        
                 
     """
     DELETE Questions

@@ -20,7 +20,6 @@ def paginate_questions(request, selection):
 
 def filter_questions(request):
     search_term = request.args.get("q", '', type=str)
-    print(search_term)
     return Question.question.like(f'%{search_term}%')
 
 def create_app(test_config=None):
@@ -88,6 +87,25 @@ def create_app(test_config=None):
                 'success': True
             })
         
+    @app.route('/categories/<int:category_id>/questions', methods=['GET'])
+    def get_question_by_category(category_id):
+        
+        questions = Question.query.filter(Question.category == str( category_id )).all()
+        current_questions = paginate_questions(request, questions)
+        categories = Category.query.all()
+        categories_json_formated = {}
+        for category in categories:
+            categories_json_formated[category.id] = category.type
+            
+        return jsonify({
+            'categories': categories_json_formated,
+            'current_category': categories_json_formated[category.id],
+            'questions': current_questions,
+            'success': True,
+            'total_questions': len(questions)
+        })
+            
+            
     @app.route('/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
         question_to_delete = Question.query.filter(Question.id == question_id).one_or_none()
@@ -129,16 +147,6 @@ def create_app(test_config=None):
             'success': True
         })
         
-    """
-    @TODO:
-    Create a POST endpoint to get questions based on a search term.
-    It should return any questions for whom the search term
-    is a substring of the question.
-
-    TEST: Search by any phrase. The questions list will update to include
-    only question that include that string within their question.
-    Try using the word "title" to start.
-    """
 
     """
     @TODO:
