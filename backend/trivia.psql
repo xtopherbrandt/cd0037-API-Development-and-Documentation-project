@@ -24,6 +24,8 @@ SET default_with_oids = false;
 -- Name: categories; Type: TABLE; Schema: public; Owner: student
 --
 
+DROP TABLE IF EXISTS public.categories CASCADE;
+
 CREATE TABLE public.categories (
     id integer NOT NULL,
     type text
@@ -57,6 +59,8 @@ ALTER SEQUENCE public.categories_id_seq OWNED BY public.categories.id;
 --
 -- Name: questions; Type: TABLE; Schema: public; Owner: student
 --
+
+DROP TABLE IF EXISTS public.questions CASCADE;
 
 CREATE TABLE public.questions (
     id integer NOT NULL,
