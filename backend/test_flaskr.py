@@ -104,7 +104,6 @@ class TriviaTestCase(unittest.TestCase):
         
         data_json = json.loads( result.data )
         
-        self.assertEqual( result.status_code, 200 )
         self.check_basic_response_format( result, ['categories', 'questions', 'current_category', 'total_questions'] )
         
         current_category = data_json['current_category']
@@ -123,7 +122,25 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(get_result.status_code, 404, 'Get of a non-existant question should return a 404.')
         self.assertEqual(get_data_json['error'], 404, 'Incorrect response message. Get of a non-existant question should return a 404')
 
+    def test_get_with_a_search_term_returns_those_questions(self):
+        get_result = self.client().get('/questions?q=Tim Burton')
         
+        self.assertEqual( get_result.status_code, 200, 'Get questions with a search term returned an error.')
+        self.check_basic_response_format(get_result, ['categories', 'questions', 'current_category', 'total_questions'])
+        
+        get_result_json = json.loads(get_result.data)
+        
+        self.assertEqual(len(get_result_json['questions']), 1, 'Get questions with "Tim Burton" should return 1 question')
+
+    def test_get_with_a_search_term_and_a_page_returns_the_correct_page(self):
+        get_result = self.client().get('/questions?q=in&page=2')
+        
+        self.assertEqual( get_result.status_code, 200, 'Get questions with a search term returned an error.')
+        self.check_basic_response_format(get_result, ['categories', 'questions', 'current_category', 'total_questions'])
+        
+        get_result_json = json.loads(get_result.data)
+        
+        self.assertGreater(len(get_result_json['questions']), 1, 'Get questions searching for 'in' with page 2 should return more than 1 question')
                 
     """
     DELETE Questions

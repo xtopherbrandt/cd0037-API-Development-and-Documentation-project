@@ -76,10 +76,11 @@ json { "categories": { "1": "Science", "2": "Art", "3": "Geography", "4": "Histo
 ```
 
 ### GET /questions
-Retrieves a paginated list of all questions.
+Retrieves a paginated list of questions. The set of questions in the result can be controlled with request parameters.
 
 **Request Parameters**:
 * `page` (optional): The page number to retrieve (default: 1).
+* `q` (optional): A question search term. Only questions containing this search term in the question text are returned. 
 
 **Response Body**: 
 ```

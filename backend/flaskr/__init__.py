@@ -18,6 +18,11 @@ def paginate_questions(request, selection):
 
     return current_questions
 
+def filter_questions(request):
+    search_term = request.args.get("q", '', type=str)
+    print(search_term)
+    return Question.question.like(f'%{search_term}%')
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
@@ -55,7 +60,8 @@ def create_app(test_config=None):
 
     @app.route('/questions', methods=['GET'])
     def get_questions_no_page_specified():
-        questions = Question.query.order_by(Question.id).all()
+        filter_criteria = filter_questions(request)
+        questions = Question.query.filter(filter_criteria).order_by(Question.id).all()
         current_questions = paginate_questions(request, questions)
         categories = Category.query.all()
         categories_json_formated = {}
@@ -98,17 +104,6 @@ def create_app(test_config=None):
             'success': True
         })
                 
-    
-    """
-    @TODO:
-    Create an endpoint to POST a new question,
-    which will require the question and answer text,
-    category, and difficulty score.
-
-    TEST: When you submit a question on the "Add" tab,
-    the form will clear and the question will appear at the end of the last page
-    of the questions list in the "List" tab.
-    """
 
     @app.route('/questions', methods=['POST'])
     def post_question():
