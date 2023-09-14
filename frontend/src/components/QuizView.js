@@ -22,7 +22,7 @@ class QuizView extends Component {
 
   componentDidMount() {
     $.ajax({
-      url: BASE_URL + `/categories`, //TODO: update request URL
+      url: BASE_URL + `/categories`, 
       type: 'GET',
       success: (result) => {
         this.setState({ categories: result.categories });
