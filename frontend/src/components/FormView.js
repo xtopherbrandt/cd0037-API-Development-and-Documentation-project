@@ -17,7 +17,7 @@ class FormView extends Component {
 
   componentDidMount() {
     $.ajax({
-      url: BASE_URL + `/categories`, //TODO: update request URL
+      url: BASE_URL + `/categories`,
       type: 'GET',
       success: (result) => {
         this.setState({ categories: result.categories });
@@ -33,7 +33,7 @@ class FormView extends Component {
   submitQuestion = (event) => {
     event.preventDefault();
     $.ajax({
-      url: BASE_URL + '/questions', //TODO: update request URL
+      url: BASE_URL + '/questions', 
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
