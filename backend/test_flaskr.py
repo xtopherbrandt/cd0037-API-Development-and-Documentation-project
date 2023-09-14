@@ -177,8 +177,46 @@ class TriviaTestCase(unittest.TestCase):
         for question in science_questions:
             self.assertDictEqual(question, get_science_questions_json['questions'][i])
             i += 1
+
+    """
+    GET Quizzes
+    """        
+    def test_get_quizzes_with_no_parameters_returns_a_question(self):
+        get_result = self.client().get('/quizzes')
         
-                
+        get_result_json = json.loads(get_result.data)
+        
+        self.check_basic_response_format(get_result, ['question', 'success'])
+        self.assertTrue(get_result_json['success'], 'Get Quizzes with no parameters should return successfully')
+        self.assertIn('question', get_result_json['question'], 'Get Quizzes should return a dictionary with a question key')
+    
+    def test_get_quizzes_with_a_valid_category_returns_a_question_in_that_category(self):
+        get_result = self.client().get('/quizzes?category=1')
+        
+        get_result_json = json.loads(get_result.data)
+        
+        self.check_basic_response_format(get_result, ['question', 'success'])
+        self.assertTrue(get_result_json['success'], 'Get Quizzes with a valid category should return successfully')
+        self.assertIn('category', get_result_json['question'], 'Get Quizzes should return a dictionary with a category key')
+        self.assertEqual( get_result_json['question']['category'], 1, 'Get Quizzes should return a question in the same category as requested')
+        
+    def test_get_quizzes_with_an_invalid_category_returns_no_question(self):
+        get_result = self.client().get('/quizzes?category=9999')
+        
+        get_result_json = json.loads(get_result.data)
+        
+        self.check_basic_response_format(get_result, ['success'])
+        self.assertTrue(get_result_json['success'], 'Get Quizzes with an invalid category should return successfully')
+        self.assertNotIn('question', get_result_json, 'Get Quizzes should not return a question key when no question can be found')
+            
+    def test_get_quizzes_with_no_questions_left_returns_no_question(self):
+        get_result = self.client().get('/quizzes?category=1&previous_questions=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23')
+        
+        get_result_json = json.loads(get_result.data)
+        
+        self.check_basic_response_format(get_result, ['success'])
+        self.assertTrue(get_result_json['success'], 'Get Quizzes with an invalid category should return successfully')
+        self.assertNotIn('question', get_result_json, 'Get Quizzes should not return a question key when no question can be found')
     """
     DELETE Questions
     """

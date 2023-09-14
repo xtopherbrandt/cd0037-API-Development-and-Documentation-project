@@ -1,10 +1,11 @@
 import os
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import values, column, select, Integer
 from flask_cors import CORS
 import random
 
-from models import setup_db, Question, Category
+from models import setup_db, Question, Category, db
 
 QUESTIONS_PER_PAGE = 10
 
@@ -150,15 +151,6 @@ def create_app(test_config=None):
 
     """
     @TODO:
-    Create a GET endpoint to get questions based on category.
-
-    TEST: In the "List" tab / main screen, clicking on one of the
-    categories in the left column will cause only questions of that
-    category to be shown.
-    """
-
-    """
-    @TODO:
     Create a POST endpoint to get questions to play the quiz.
     This endpoint should take category and previous question parameters
     and return a random questions within the given category,
@@ -169,6 +161,42 @@ def create_app(test_config=None):
     and shown whether they were correct or not.
     """
 
+    @app.route('/quizzes', methods=['GET'])
+    def get_quiz_question():
+       
+        category_id = request.args.get("category", None, type=int)
+        previous_questions_raw = request.args.get("previous_questions", None, type=str)
+ 
+        if category_id is not None and category_id != 0 :
+
+            statement_base_question_select = select(Question.id).where(Question.category == category_id)
+            
+        else:
+            statement_base_question_select = select(Question.id)
+                
+        if previous_questions_raw is not None and len(previous_questions_raw) > 0:
+            previous_questions = list(map( lambda item: ( int(item), ''), previous_questions_raw.split(',')))
+            previous_question_values = values(column('id'), column('v'), name='test').data(previous_questions)
+            statement_previous_question_values_select = select(previous_question_values.c.id)
+            statement_question_select_filtered = statement_base_question_select.except_(statement_previous_question_values_select)
+        else:
+            statement_question_select_filtered = statement_base_question_select
+        
+        final_select = select(Question).where(Question.id.in_(statement_question_select_filtered))
+        questions = db.session.execute(final_select).scalars().all()           
+        
+        if len(questions) > 0 :
+            selected_question_index = random.randint(0, len(questions)-1)
+        
+            return jsonify({
+                'success': True,
+                'question': questions[selected_question_index].format()
+            })
+        else:
+            return jsonify({
+                'success': True
+            })
+        
     """
     @TODO:
     Create error handlers for all expected errors

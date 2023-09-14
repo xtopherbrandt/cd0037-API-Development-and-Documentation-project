@@ -133,13 +133,14 @@ Deletes a question.
 json { "success": true }
 ```
 
-### POST /quizzes
+### GET /quizzes
 Retrieves a random question for a quiz.
 
-**Request Body**:
-```
-json { "previous_questions": [1, 2, 3], "quiz_category": { "id": 1, "type": "Science" } }
-```
+**Request Parameters**:
+
+* `category` (optional): the id of the category for the next question. If none is provided a random category is selected
+* `previous_questions` (optional): a comma separated list of questions already used.
+
 
 **Response Body**: 
 ```
