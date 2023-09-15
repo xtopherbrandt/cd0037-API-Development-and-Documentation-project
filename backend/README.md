@@ -13,7 +13,7 @@ PostgreSQL
 ### Installation
 1. Clone the repository:
     ```
-    git clone https://github.com/your-username/udacity-trivia-api.git
+    git clone https://github.com/xtopherbrandt/cd0037-API-Development-and-Documentation-project.git
     ```
 1. Navigate to the project directory:
     ```
@@ -34,22 +34,47 @@ PostgreSQL
     ```
 1. Install the required dependencies:
     ```
-    pip install -r requirements.txt
+    pip install -r .\backend\requirements.txt
     ```
-1. Set up the database:
-    - Create a PostgreSQL database named trivia:
+1. Set up the main database:
+    - For Windows run the following batch file
+    ```
+    .\backend\set_up_trivia_db.bat
+    ```
+    - For non-Windows create the database and import the data
     ```
     createdb trivia
     ```
     - Import the sample data into the database:
     ```
     psql trivia < trivia.psql
+
+1. Set up the unit test database:
+    - For Windows run the following batch file
     ```
+    .\backend\set_up_trivia_test_db.bat
+    ```
+    - For non-Windows create the database and import the data
+    ```
+    createdb trivia_test
+    ```
+    - Import the sample data into the database:
+    ```
+    psql trivia_test < trivia.psql
+    ```
+
 1. Start the server:
     ```
     export FLASK_APP=flaskr
     export FLASK_ENV=development
     flask run
+    ```
+    - For Windows with Powershell
+    ```
+    $env.flask_app='flaskr'
+    $env.flask_env='development'
+    cd backend
+    flask run --reload
     ```
 ## API Endpoints
 The Udacity Trivia API provides the following endpoints:
