@@ -9,7 +9,11 @@ from models import setup_db, Question, Category, db
 
 QUESTIONS_PER_PAGE = 10
 
-def paginate_questions(request, selection):
+
+def paginate_questions(request: request, selection: list) -> list:
+    '''
+    Returns the questions in selection as a list of formatted objects for the page requested in the paramters.
+    '''
     page = request.args.get("page", 1, type=int)
     start = (page - 1) * QUESTIONS_PER_PAGE
     end = start + QUESTIONS_PER_PAGE
@@ -19,7 +23,10 @@ def paginate_questions(request, selection):
 
     return current_questions
 
-def filter_questions(request):
+def filter_questions(request: request):
+    '''
+    Returns a column filter based on the search paramter (q) in the request.
+    '''
     search_term = request.args.get("q", '', type=str)
     return Question.question.like(f'%{search_term}%')
 
@@ -51,6 +58,9 @@ def create_app(test_config=None):
     
     @app.route('/categories', methods=['GET'])
     def get_categories():
+        '''
+        Return the list of categories.
+        '''
         categories = Category.query.all()
         categories_json_formated = {}
         for category in categories:
@@ -63,6 +73,9 @@ def create_app(test_config=None):
 
     @app.route('/questions', methods=['GET'])
     def get_questions_no_page_specified():
+        '''
+        Return a paginated list of questions optionally filtered by a search parameter.
+        '''
         filter_criteria = filter_questions(request)
         questions = Question.query.filter(filter_criteria).order_by(Question.id).all()
         current_questions = paginate_questions(request, questions)
@@ -81,6 +94,9 @@ def create_app(test_config=None):
 
     @app.route('/questions/<int:question_id>', methods=['GET'])
     def get_question_by_id(question_id):
+        '''
+        Return a specific question.
+        '''
         question = Question.query.filter(Question.id == question_id).one_or_none()
         
         if question is None:
@@ -93,7 +109,9 @@ def create_app(test_config=None):
         
     @app.route('/categories/<int:category_id>/questions', methods=['GET'])
     def get_question_by_category(category_id):
-        
+        '''
+        Return a paginated list of questions for the category.
+        '''
         questions = Question.query.filter(Question.category == str( category_id )).all()
         current_questions = paginate_questions(request, questions)
         categories = Category.query.all()
@@ -112,6 +130,9 @@ def create_app(test_config=None):
             
     @app.route('/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
+        '''
+        Delete the specified question from the datastore.
+        '''
         question_to_delete = Question.query.filter(Question.id == question_id).one_or_none()
         
         if question_to_delete is None:
@@ -129,6 +150,9 @@ def create_app(test_config=None):
 
     @app.route('/questions', methods=['POST'])
     def post_question():
+        '''
+        Insert a new question into the datastore.
+        '''
         data = request.get_json()
         
         if 'question' not in data or 'answer' not in data or 'category' not in data or 'difficulty' not in data:
@@ -154,7 +178,14 @@ def create_app(test_config=None):
 
     @app.route('/quizzes', methods=['GET'])
     def get_quiz_question():
-       
+        '''
+        Return a single randomly selected question.
+        
+        Request Query Parameters
+        ------------------------
+        category : the category id for the question.
+        previous_questions : a comma separated list of questions to be excluded.
+        '''
         category_id = request.args.get("category", None, type=int)
         previous_questions_raw = request.args.get("previous_questions", None, type=str)
  

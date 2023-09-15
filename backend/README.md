@@ -55,11 +55,12 @@ PostgreSQL
 The Udacity Trivia API provides the following endpoints:
 
 * `GET /categories`: Retrieves a list of all available categories.
-* `GET /questions`: Retrieves a paginated list of all questions.
+* `GET /questions`: Retrieves a paginated list of questions which can be filtered with a search parameter.
+* `GET /questions/{question_id}`: Retrieves a single question specified by it's Id.
 * `GET /categories/{category_id}/questions`: Retrieves a paginated list of questions in a specific category.
 * `POST /questions`: Creates a new question.
-`DELETE /questions/{question_id}`: Deletes a question.
-* `POST /quizzes`: Retrieves a random question for a quiz.
+* `DELETE /questions/{question_id}`: Deletes a question.
+* `GET /quizzes`: Retrieves a random question for a quiz.
 
 For detailed information about each endpoint, including request parameters and response bodies, please refer to the API Documentation section below.
 
@@ -87,7 +88,7 @@ Retrieves a paginated list of questions. The set of questions in the result can 
 json { "categories": { "1": "Science", "2": "Art", "3": "Geography", "4": "History", "5": "Entertainment", "6": "Sports" }, "current_category": null, "questions": [ { "id": 1, "question": "What is the capital of France?", "answer": "Paris", "difficulty": 2, "category": 3 }, ... ], "success": true, "total_questions": 20 }
 ```
 
-### GET /question/{question_id}
+### GET /questions/{question_id}
 Retrieves a single question by it's Id.
 
 **Request Parameters**:
