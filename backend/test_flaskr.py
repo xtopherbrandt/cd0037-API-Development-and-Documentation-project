@@ -1,10 +1,9 @@
-import os
+from config import database_password_unit_test
 import unittest
 import json
-from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
-from models import setup_db, Question, Category
+
 
 
 class TriviaTestCase(unittest.TestCase):
@@ -13,7 +12,7 @@ class TriviaTestCase(unittest.TestCase):
     def setUp(self):
         """Define test variables and initialize app."""
         self.database_name = "trivia_test"
-        self.database_path = "postgresql://{}:{}@{}/{}".format('xtopher','wolf','localhost:5432', self.database_name)
+        self.database_path = "postgresql://{}:{}@{}/{}".format('xtopher',database_password_unit_test,'localhost:5432', self.database_name)
         self.app = create_app(test_config=self.database_path)
         self.client = self.app.test_client
     
@@ -22,7 +21,7 @@ class TriviaTestCase(unittest.TestCase):
         pass
 
     def check_basic_response_format(self, result, response_keys = [] ):
-        
+        '''Helper function to check the standard parts of the response are correct and consistent'''
         result_data_json = json.loads( result.data )
         self.assertTrue('success' in result_data_json.keys(), 'Incorrect response format. Missing "success" key' )       
 

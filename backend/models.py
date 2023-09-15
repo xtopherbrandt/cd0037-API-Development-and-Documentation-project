@@ -1,11 +1,11 @@
-import os
+from config import database_password_local
 from sqlalchemy import Column, String, Integer, create_engine
 from flask_sqlalchemy import SQLAlchemy
 import json
 
 database_name = 'trivia'
 database_path = "postgresql://{}:{}@{}/{}".format(
-    "xtopher", "wolf", "localhost:5432", database_name)
+    "xtopher", database_password_local, "localhost:5432", database_name)
 
 db = SQLAlchemy()
 
